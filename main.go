@@ -15,5 +15,7 @@ func main(){
 	r.GET("/users/:id", controllers.ShowUser)
 	r.PATCH("/users/:id", controllers.UpdateUser)
 	r.DELETE("/users/:id", controllers.DeleteUser)
-	r.Run()
+	err := r.Run(); if err != nil {
+		panic("Cannot start app")
+	}
 }

@@ -1,0 +1,18 @@
+name: Checks
+on:
+  push:
+    branches:
+      - "main"
+      - "develop"
+  pull_request:
+    branches:
+      - main
+jobs:
+  lint-and-unit-test:
+    name: lint-and-unit-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v3.4.0
+        with:
+          version: v1.51.1
