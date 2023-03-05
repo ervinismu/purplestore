@@ -1,1 +1,7 @@
+# Environment vars
 .env
+
+# Others
+postgres-data/
+data/
+docs/
