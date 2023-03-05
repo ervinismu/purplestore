@@ -4,14 +4,9 @@ import (
 	"github.com/ervinismu/purplestore/controllers"
 	"github.com/ervinismu/purplestore/models"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main(){
-
-	err := godotenv.Load(".env"); if err != nil {
-		panic("cannot load env varaiable")
-	}
 
 	r := gin.Default()
 	models.ConnectDB()
@@ -28,7 +23,7 @@ func main(){
 	r.PATCH("/products/:id", controllers.UpdateProduct)
 	r.DELETE("/products/:id", controllers.DeleteProduct)
 
-	err = r.Run(); if err != nil {
+	err := r.Run(); if err != nil {
 		panic("Cannot start app")
 	}
 }
