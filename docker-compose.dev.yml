@@ -1,0 +1,66 @@
+version: '3.1'
+
+services:
+  api:
+    build:
+      dockerfile: Dockerfile-dev
+      context: .
+      target: dev
+    ports:
+      - "8083:8080"
+    volumes:
+      - .:/opt/app/api
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - 5433:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    healthcheck:
+      test: [
+        "CMD-SHELL",
+        "pg_isready -U ${POSTGRES_USER}"
+      ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  swagger:
+    image: expend/swagger-ui
+    ports:
+      - "8003:8080"
+    volumes:
+      - ./docs:/api_docs
+    environment:
+      - SWAGGER_JSON=/api_docs/api.yml
+      - BASE_URL=/swagger
+
+  migrate:
+    image: migrate/migrate:v4.15.2
+    profiles: ["tools"]
+    volumes:
+      - ./db/migrations:/migrations
+    env_file:
+      - .env
+    entrypoint: [
+      "migrate",
+      "-path",
+      "/migrations",
+      "-database",
+      "postgresql://${POSTGRES_USER}@db:5432/${POSTGRES_DB}?sslmode=disable"
+    ]
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

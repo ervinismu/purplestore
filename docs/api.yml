@@ -1,0 +1,57 @@
+openapi: 3.0.0
+info:
+  description: |
+    This is a sample Purplestore server.  You can find
+    out more about Swagger at
+    [http://swagger.io](http://swagger.io) or on
+    [irc.freenode.net, #swagger](http://swagger.io/irc/).
+  version: "1.0.0"
+  title: Swagger Purplestore
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: 'http://localhost:8083'
+tags:
+  - name: Product
+    description: Everything about your Product
+
+paths:
+  /products:
+    get:
+      tags:
+        - Product
+      summary: Get list all products
+      operationId: listProduct
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: bag
+        description:
+          type: string
+          example: famous product ever
+  requestBodies:
