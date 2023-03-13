@@ -1,86 +1,81 @@
 package controllers
 
 import (
-	"net/http"
-
-	"github.com/ervinismu/purplestore/models"
+	"github.com/ervinismu/purplestore/handler"
+	"github.com/ervinismu/purplestore/schema"
+	"github.com/ervinismu/purplestore/service"
 	"github.com/gin-gonic/gin"
 )
 
-type CreateProductInput struct {
-	Name        string `json:"name" binding:"required"`
-	Description string `json:"description" binding:"required"`
+type productController struct {
+	service service.ProductService
 }
 
-type UpdateProductInput struct {
-	Name        string `json:"name" binding:"required"`
-	Description string `json:"description" binding:"required"`
+func NewProductController(ps service.ProductService) productController {
+	return productController{ service: ps }
 }
 
-func ListProducts(c *gin.Context) {
-	var products []models.Product
-
-	models.DB.Find(&products)
-
-	c.JSON(http.StatusOK, gin.H{ "data": products })
-}
-
-func ShowProduct(c *gin.Context) {
-	var product models.Product
-	productId := c.Param("id")
-	if err := models.DB.Where("id = ?", productId).First(&product).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H { "error": "Record not found!" })
+func (pc productController) ListProducts(ctx *gin.Context) {
+	products, err := pc.service.ListAllProduct()
+	if err != nil {
+		handler.HandlerErrorResponse(ctx, "Cannot get list products")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{ "data": product })
+	handler.HandlerSuccessResponse(ctx, "Success get products", products )
 }
 
-func CreateProduct(c *gin.Context) {
-	var input CreateProductInput
-
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H { "error": err.Error() })
+func (pc productController) ShowProduct(ctx *gin.Context) {
+	id := ctx.Param("id")
+	product, err := pc.service.ShowDetailProduct(id)
+	if err != nil {
+		handler.HandlerErrorResponse(ctx, "Record not found")
 		return
 	}
 
-	product := models.Product{
-		Name: input.Name,
-		Description: input.Description,
-	}
-	models.DB.Create(&product)
-
-	c.JSON(http.StatusOK, gin.H{ "data": product })
+	handler.HandlerSuccessResponse(ctx, "Success get detail products", product )
 }
 
-func UpdateProduct(c *gin.Context) {
-	var product models.Product
-	productId := c.Param("id")
-	if err := models.DB.Where("id = ?", productId).First(&product).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H { "error": "Record not found!" })
+func (pc productController) CreateProduct(ctx *gin.Context) {
+	var input schema.CreateProductReq
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		handler.HandlerErrorResponse(ctx, err.Error())
+		return
+	}
+	product, err := pc.service.CreateProduct(input)
+	if err != nil {
+		handler.HandlerErrorResponse(ctx, err.Error())
 		return
 	}
 
-	var input UpdateProductInput
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H { "error": err.Error() })
-		return
-	}
-
-	product.Name = input.Name
-	product.Description = input.Description
-	models.DB.Save(&product)
-	c.JSON(http.StatusOK, gin.H {"data": product})
+	handler.HandlerSuccessResponse(ctx, "Success create product", product )
 }
 
-func DeleteProduct(c *gin.Context) {
-	var product models.Product
-	productId := c.Param("id")
-	if err := models.DB.Where("id = ?", productId).First(&product).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H { "error": "Record not found" })
+func (pc productController) DeleteProduct(ctx *gin.Context) {
+	id := ctx.Param("id")
+	product, err := pc.service.DeleteProduct(id)
+	if err != nil {
+		handler.HandlerErrorResponse(ctx, "Record not found")
 		return
 	}
 
-	models.DB.Delete(&product)
-	c.JSON(http.StatusOK, gin.H { "data": true })
+	handler.HandlerSuccessResponse(ctx, "Success delete product", product )
+}
+
+func (pc productController) UpdateProduct(ctx *gin.Context) {
+	var input schema.UpdateProductReq
+	id := ctx.Param("id")
+
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		handler.HandlerErrorResponse(ctx, err.Error())
+		return
+	}
+
+	product, err := pc.service.UpdateProduct(id, input)
+	if err != nil {
+		handler.HandlerErrorResponse(ctx, "Record not found")
+		return
+	}
+
+	handler.HandlerSuccessResponse(ctx, "Success update product", product)
 }

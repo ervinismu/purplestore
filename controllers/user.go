@@ -1,86 +1,80 @@
 package controllers
 
 import (
-	"net/http"
-
-	"github.com/ervinismu/purplestore/models"
+	"github.com/ervinismu/purplestore/handler"
+	"github.com/ervinismu/purplestore/schema"
+	"github.com/ervinismu/purplestore/service"
 	"github.com/gin-gonic/gin"
 )
 
-type CreateUserInput struct {
-	Email  string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
-	Username string `json:"username" binding:"required"`
+type userController struct {
+	service service.UserService
 }
 
-type UpdateUserInput struct {
-	Username string `json:"username"`
+func NewUserController(us service.UserService) userController {
+	return userController{service: us}
 }
 
-func ListUsers(c *gin.Context) {
-	var users []models.User
-
-	models.DB.Find(&users)
-
-	c.JSON(http.StatusOK, gin.H{ "data": users })
-}
-
-func ShowUser(c *gin.Context) {
-	var user models.User
-	userId := c.Param("id")
-	if err := models.DB.Where("id = ?", userId).First(&user).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H { "error": "Record not found!" })
+func (uc userController) ListAllUser(ctx *gin.Context) {
+	users, err := uc.service.ListAllUser()
+	if err != nil {
+		handler.HandlerErrorResponse(ctx, "Cannot get data users")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{ "data": user })
+	handler.HandlerSuccessResponse(ctx, "Success get users", users )
 }
 
-func CreateUser(c *gin.Context) {
-	var input CreateUserInput
-
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H { "error": err.Error() })
+func (uc userController) ShowUser(ctx *gin.Context) {
+	id := ctx.Param("id")
+	user, err := uc.service.ShowUser(id)
+	if err != nil {
+		handler.HandlerErrorResponse(ctx, "Record not found")
 		return
 	}
 
-	user := models.User{
-		Email: input.Email,
-		Username: input.Username,
-		Password: input.Password,
-	}
-	models.DB.Create(&user)
-
-	c.JSON(http.StatusOK, gin.H{ "data": user })
+	handler.HandlerSuccessResponse(ctx, "Success show user", user)
 }
 
-func UpdateUser(c *gin.Context) {
-	var user models.User
-	userId := c.Param("id")
-	if err := models.DB.Where("id = ?", userId).First(&user).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H { "error": "Record not found!" })
+func (uc userController) CreateUser(ctx *gin.Context) {
+	var input schema.CreateUserReq
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		handler.HandlerErrorResponse(ctx, err.Error())
+		return
+	}
+	user, err := uc.service.CreateUser(input)
+	if err != nil {
+		handler.HandlerErrorResponse(ctx, err.Error())
 		return
 	}
 
-	var input UpdateUserInput
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H { "error": err.Error() })
-		return
-	}
-
-	user.Username = input.Username
-	models.DB.Save(&user)
-	c.JSON(http.StatusOK, gin.H {"data": user})
+	handler.HandlerSuccessResponse(ctx, "Success create user", user)
 }
 
-func DeleteUser(c *gin.Context) {
-	var user models.User
-	userId := c.Param("id")
-	if err := models.DB.Where("id = ?", userId).First(&user).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H { "error": "Record not found" })
+func (uc userController) UpdateUser(ctx *gin.Context) {
+	var input schema.UpdateUserReq
+	id := ctx.Param("id")
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		handler.HandlerErrorResponse(ctx, "Record not found")
 		return
 	}
 
-	models.DB.Delete(&user)
-	c.JSON(http.StatusOK, gin.H { "data": true })
+	user, err := uc.service.UpdateUser(id, input)
+	if err != nil {
+		handler.HandlerErrorResponse(ctx, "Record not found")
+		return
+	}
+
+	handler.HandlerSuccessResponse(ctx, "Success update user", user)
+}
+
+func (uc userController) DeleteUser(ctx *gin.Context) {
+	id := ctx.Param("id")
+	user, err := uc.service.DeleteUser(id)
+	if err != nil {
+		handler.HandlerErrorResponse(ctx, "Record not found")
+		return
+	}
+
+	handler.HandlerSuccessResponse(ctx, "Success delete user", user)
 }

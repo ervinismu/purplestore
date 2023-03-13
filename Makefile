@@ -18,7 +18,7 @@ help h:
 #===================#
 #== Env Variables ==#
 #===================#
-DOCKER_COMPOSE_FILE ?= docker-compose.yml
+DOCKER_COMPOSE_FILE ?= docker-compose.dev.yml
 
 
 #========================#
@@ -49,3 +49,8 @@ shell-db:
 shell-api: ## Enter to api console
 shell-api:
 	docker compose -f ${DOCKER_COMPOSE_FILE} exec api /bin/sh
+
+
+run : ## running docker compose services
+run :
+	docker compose -f ${DOCKER_COMPOSE_FILE} up
