@@ -1,10 +1,7 @@
 package main
 
 import (
-	"github.com/ervinismu/purplestore/controllers"
 	"github.com/ervinismu/purplestore/db"
-	"github.com/ervinismu/purplestore/repository"
-	"github.com/ervinismu/purplestore/service"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -19,20 +16,15 @@ func main(){
 	}))
 
 	db := db.ConnectDB()
-	userRepository := repository.NewUserRepository(db)
-	userService := service.NewUserService(userRepository)
-	userController := controllers.NewUserController(userService)
 
+	userController := InitUserController(db)
 	r.GET("/users", userController.ListAllUser)
 	r.GET("/users/:id", userController.ShowUser)
 	r.POST("/users", userController.CreateUser)
 	r.PATCH("/users/:id", userController.UpdateUser)
 	r.DELETE("/users/:id", userController.DeleteUser)
 
-	productRepository := repository.NewProductRepository(db)
-	productService := service.NewProductService(productRepository)
-	productController := controllers.NewProductController(productService)
-
+	productController := InitProductController(db)
 	r.GET("/products", productController.ListProducts)
 	r.GET("/products/:id", productController.ShowProduct)
 	r.POST("/products", productController.CreateProduct)

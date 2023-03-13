@@ -7,15 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type userController struct {
+type UserController struct {
 	service service.UserService
 }
 
-func NewUserController(us service.UserService) userController {
-	return userController{service: us}
+func NewUserController(us service.UserService) UserController {
+	return UserController{service: us}
 }
 
-func (uc userController) ListAllUser(ctx *gin.Context) {
+func (uc UserController) ListAllUser(ctx *gin.Context) {
 	users, err := uc.service.ListAllUser()
 	if err != nil {
 		handler.HandlerErrorResponse(ctx, "Cannot get data users")
@@ -25,7 +25,7 @@ func (uc userController) ListAllUser(ctx *gin.Context) {
 	handler.HandlerSuccessResponse(ctx, "Success get users", users )
 }
 
-func (uc userController) ShowUser(ctx *gin.Context) {
+func (uc UserController) ShowUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 	user, err := uc.service.ShowUser(id)
 	if err != nil {
@@ -36,7 +36,7 @@ func (uc userController) ShowUser(ctx *gin.Context) {
 	handler.HandlerSuccessResponse(ctx, "Success show user", user)
 }
 
-func (uc userController) CreateUser(ctx *gin.Context) {
+func (uc UserController) CreateUser(ctx *gin.Context) {
 	var input schema.CreateUserReq
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		handler.HandlerErrorResponse(ctx, err.Error())
@@ -51,7 +51,7 @@ func (uc userController) CreateUser(ctx *gin.Context) {
 	handler.HandlerSuccessResponse(ctx, "Success create user", user)
 }
 
-func (uc userController) UpdateUser(ctx *gin.Context) {
+func (uc UserController) UpdateUser(ctx *gin.Context) {
 	var input schema.UpdateUserReq
 	id := ctx.Param("id")
 	if err := ctx.ShouldBindJSON(&input); err != nil {
@@ -68,7 +68,7 @@ func (uc userController) UpdateUser(ctx *gin.Context) {
 	handler.HandlerSuccessResponse(ctx, "Success update user", user)
 }
 
-func (uc userController) DeleteUser(ctx *gin.Context) {
+func (uc UserController) DeleteUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 	user, err := uc.service.DeleteUser(id)
 	if err != nil {

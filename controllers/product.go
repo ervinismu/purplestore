@@ -7,15 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type productController struct {
+type ProductController struct {
 	service service.ProductService
 }
 
-func NewProductController(ps service.ProductService) productController {
-	return productController{ service: ps }
+func NewProductController(ps service.ProductService) ProductController {
+	return ProductController{ service: ps }
 }
 
-func (pc productController) ListProducts(ctx *gin.Context) {
+func (pc ProductController) ListProducts(ctx *gin.Context) {
 	products, err := pc.service.ListAllProduct()
 	if err != nil {
 		handler.HandlerErrorResponse(ctx, "Cannot get list products")
@@ -25,7 +25,7 @@ func (pc productController) ListProducts(ctx *gin.Context) {
 	handler.HandlerSuccessResponse(ctx, "Success get products", products )
 }
 
-func (pc productController) ShowProduct(ctx *gin.Context) {
+func (pc ProductController) ShowProduct(ctx *gin.Context) {
 	id := ctx.Param("id")
 	product, err := pc.service.ShowDetailProduct(id)
 	if err != nil {
@@ -36,7 +36,7 @@ func (pc productController) ShowProduct(ctx *gin.Context) {
 	handler.HandlerSuccessResponse(ctx, "Success get detail products", product )
 }
 
-func (pc productController) CreateProduct(ctx *gin.Context) {
+func (pc ProductController) CreateProduct(ctx *gin.Context) {
 	var input schema.CreateProductReq
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		handler.HandlerErrorResponse(ctx, err.Error())
@@ -51,7 +51,7 @@ func (pc productController) CreateProduct(ctx *gin.Context) {
 	handler.HandlerSuccessResponse(ctx, "Success create product", product )
 }
 
-func (pc productController) DeleteProduct(ctx *gin.Context) {
+func (pc ProductController) DeleteProduct(ctx *gin.Context) {
 	id := ctx.Param("id")
 	product, err := pc.service.DeleteProduct(id)
 	if err != nil {
@@ -62,7 +62,7 @@ func (pc productController) DeleteProduct(ctx *gin.Context) {
 	handler.HandlerSuccessResponse(ctx, "Success delete product", product )
 }
 
-func (pc productController) UpdateProduct(ctx *gin.Context) {
+func (pc ProductController) UpdateProduct(ctx *gin.Context) {
 	var input schema.UpdateProductReq
 	id := ctx.Param("id")
 

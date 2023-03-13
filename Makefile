@@ -54,3 +54,17 @@ shell-api:
 run : ## running docker compose services
 run :
 	docker compose -f ${DOCKER_COMPOSE_FILE} up
+
+environment: ## Setup wire dependency injection.
+environment:
+	@echo "===== SETUP WIRE ====="
+	go install github.com/google/wire/cmd/wire@latest
+	@echo "ensuring that $GOPATH/bin is added to your $PATH."
+	@echo "======================="
+	@echo "===== BUILD IMAGE ====="
+	docker compose -f ${DOCKER_COMPOSE_FILE} build
+	@echo "======================="
+
+wire-gen: ## generate dependency injection code.
+wire-gen:
+	wire
