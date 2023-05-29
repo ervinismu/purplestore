@@ -9,7 +9,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=p4sswd
       - POSTGRES_USER=postgres
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=purpledb
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -26,7 +26,7 @@ services:
         "migrate",
         "-path",
         "/migrations",
-        "-database", "postgres://postgres:p4sswd@db:5432/postgres?sslmode=disable"
+        "-database", "postgres://postgres:p4sswd@db:5432/purpledb?sslmode=disable"
       ]
     command: ["up"]
     depends_on:

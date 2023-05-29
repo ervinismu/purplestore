@@ -9,3 +9,6 @@ migrate-up:  ## Run migrations UP
 
 migrate-down:  ## Run migrations DOWN
 	docker compose --profile tools run --rm migrate down
+
+shell-db: ## Enter to database console docker
+	docker compose exec db psql -U postgres -d postgres

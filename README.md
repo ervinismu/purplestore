@@ -3,7 +3,31 @@
 ## Prerequisites
 - install [Docker](https://docs.docker.com/engine/install/)
 
-##
+## Project Structures
+- Layout
+
+```
+.
+├── app.env.sample ( contains application configuration )
+├── cmd ( main binary )
+├── Makefile ( simplify project commands )
+├── docs ( swagger documentation )
+├── db
+│   └── migrations ( database migrations )
+└── internal
+    ├── app
+    │   ├── controllers ( request response handler )
+    │   ├── models ( all about database table )
+    │   ├── repository ( database/cache operation )
+    │   ├── router ( http router )
+    │   ├── schema ( request/response schema )
+    │   └── service ( business logic )
+    └── pkg ( private lib )
+```
+- Application flow
+```
+router --> middleware --> controllers(use schema) --> service --> repository(user model)
+```
 
 ## Migration Commands
 
