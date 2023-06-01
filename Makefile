@@ -12,3 +12,9 @@ migrate-down:  ## Run migrations DOWN
 
 shell-db: ## Enter to database console docker
 	docker compose exec db psql -U postgres -d postgres
+
+run: ## Run http server
+	go run cmd/main.go
+
+environment: ## Init app environment
+	docker compose up -d
