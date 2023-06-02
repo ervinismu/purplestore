@@ -6,6 +6,7 @@ type Config struct {
 	AppPort        string `mapstructure:"APP_PORT"`
 	DatabaseURL    string `mapstructure:"DATABASE_URL"`
 	DatabaseDriver string `mapstructure:"DATABASE_DRIVER"`
+	LogLevel       string `mapstructure:"LOG_LEVEL"`
 }
 
 func LoadConfig() (Config, error) {
