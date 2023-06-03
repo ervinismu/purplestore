@@ -67,5 +67,8 @@ func main() {
 
 	// run server
 	appPort := fmt.Sprintf(":%s", cfg.AppPort)
-	r.Run(appPort)
+	err := r.Run(appPort)
+	if err != nil {
+		log.Panic("cannot start app")
+	}
 }
