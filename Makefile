@@ -18,3 +18,6 @@ run: ## Run http server
 
 environment: ## Init app environment
 	docker compose up -d
+
+lint: ## Running linter
+	docker compose --profile tools run --rm lint golangci-lint run
