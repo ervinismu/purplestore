@@ -26,7 +26,10 @@ func (repo *CategoryRepository) GetList() ([]model.Category, error) {
 
 	for rows.Next() {
 		var category model.Category
-		rows.StructScan(&category)
+		err := rows.StructScan(&category)
+		if err != nil {
+			return categories, err
+		}
 		categories = append(categories, category)
 	}
 

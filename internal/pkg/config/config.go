@@ -4,6 +4,7 @@ import "github.com/spf13/viper"
 
 type Config struct {
 	AppPort        string `mapstructure:"APP_PORT"`
+	LogLevel       string `mapstructure:"LOG_LEVEL"`
 	DatabaseURL    string `mapstructure:"DATABASE_URL"`
 	DatabaseDriver string `mapstructure:"DATABASE_DRIVER"`
 }

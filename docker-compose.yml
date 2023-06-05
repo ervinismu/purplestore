@@ -16,6 +16,13 @@ services:
       timeout: 5s
       retries: 5
 
+  lint:
+    image: golangci/golangci-lint
+    profiles: ["tools"]
+    volumes:
+      - .:/app
+    working_dir: /app
+
   migrate:
     image: migrate/migrate:v4.15.2
     profiles: ["tools"]
