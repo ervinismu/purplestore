@@ -62,8 +62,12 @@ func main() {
 	categoryCotroller := controller.NewCategoryController(categoryService)
 
 	// categories routes
-	r.GET("/categories", categoryCotroller.GetList)
-	r.POST("/categories", categoryCotroller.Create)
+	v1Routes := r.Group("api/v1")
+	{
+		v1Routes.GET("/categories", categoryCotroller.GetList)
+		v1Routes.POST("/categories", categoryCotroller.Create)
+		v1Routes.GET("/categories/:id", categoryCotroller.Detail)
+	}
 
 	// run server
 	appPort := fmt.Sprintf(":%s", cfg.AppPort)

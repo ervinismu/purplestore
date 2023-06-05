@@ -35,3 +35,36 @@ func (repo *CategoryRepository) GetList() ([]model.Category, error) {
 
 	return categories, nil
 }
+
+func (repo *CategoryRepository) Create(data model.Category) error {
+	sqlStatement := `
+		INSERT INTO categories (name, description)
+		VALUES ($1, $2)
+	`
+
+	_, err := repo.DB.Exec(sqlStatement, data.Name, data.Description)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *CategoryRepository) GetByID(id int) (model.Category, error) {
+	var (
+		data         model.Category
+		sqlStatement = `
+			SELECT id, name, description
+			FROM categories
+			WHERE id = $1
+			LIMIT 1
+		`
+	)
+
+	err := repo.DB.QueryRowx(sqlStatement, id).StructScan(&data)
+	if err != nil {
+		return data, err
+	}
+
+	return data, nil
+}

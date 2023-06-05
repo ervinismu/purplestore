@@ -45,6 +45,22 @@ make migrate-down
 make migrate-up
 ```
 
+## Testing Command
+
+1. Running testing
+```
+make test
+```
+2. Open test coverage
+```
+make test-cover
+```
+3. Generate mocking
+Command example
+```sh
+ mockgen -source internal/app/service/category.go -destination internal/mocks/category_repository_mock.go -package mocks
+```
+
 ## Docker Compose Commands
 
 1. Running docker compose
