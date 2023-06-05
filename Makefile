@@ -21,3 +21,9 @@ environment: ## Init app environment
 
 lint: ## Running linter
 	docker compose --profile tools run --rm lint golangci-lint run
+
+test: ## Running testing
+	go test ./... -v -coverprofile=output.html
+
+test-cover: ## Open test coverage
+	go tool cover -html=output.html
