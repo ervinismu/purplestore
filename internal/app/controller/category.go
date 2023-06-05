@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/ervinismu/purplestore/internal/app/schema"
 	"github.com/gin-gonic/gin"
@@ -9,6 +10,8 @@ import (
 
 type CategoryService interface {
 	GetList() ([]schema.CategoryListResponse, error)
+	Create(req schema.CategoryCreateRequest) error
+	Detail(req schema.CategoryDetailRequest) (schema.CategoryDetailResponse, error)
 }
 
 type CategoryController struct {
@@ -38,5 +41,31 @@ func (ctrl *CategoryController) Create(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "success"})
+	err = ctrl.service.Create(req)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": "failed create category"})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{"message": "success create category"})
+}
+
+func (ctrl *CategoryController) Detail(ctx *gin.Context) {
+	var req schema.CategoryDetailRequest
+	categoryIDStr := ctx.Param("id")
+	categoryID, err := strconv.Atoi(categoryIDStr)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": "failed get detail category"})
+		return
+	}
+
+	req.ID = categoryID
+
+	response, err := ctrl.service.Detail(req)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": "failed get detail category"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"data": response})
 }

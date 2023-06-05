@@ -59,11 +59,15 @@ func main() {
 	categoryService := service.NewCategorySerivce(categoryRepository)
 
 	// init controller
-	categoryCotroller := controller.NewCategoryController(categoryService)
+	categoryController := controller.NewCategoryController(categoryService)
 
 	// categories routes
-	r.GET("/categories", categoryCotroller.GetList)
-	r.POST("/categories", categoryCotroller.Create)
+	v1Routes := r.Group("api/v1")
+	{
+		v1Routes.GET("/categories", categoryController.GetList)
+		v1Routes.POST("/categories", categoryController.Create)
+		v1Routes.GET("/categories/:id", categoryController.Detail)
+	}
 
 	// run server
 	appPort := fmt.Sprintf(":%s", cfg.AppPort)
