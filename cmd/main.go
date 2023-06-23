@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/casbin/casbin/v2"
 	"github.com/ervinismu/purplestore/internal/app/controller"
 	"github.com/ervinismu/purplestore/internal/app/repository"
 	"github.com/ervinismu/purplestore/internal/app/service"
@@ -17,6 +18,7 @@ import (
 var cfg config.Config
 var dbConn *sqlx.DB
 var err error
+var enforcer *casbin.Enforcer
 
 func init() {
 	// load configuration based on app.env
@@ -35,6 +37,13 @@ func init() {
 	err = dbConn.Ping()
 	if err != nil {
 		errMsg := fmt.Errorf("err database ping: %w", err)
+		panic(errMsg)
+	}
+
+	// cabin enforcer
+	enforcer, err = casbin.NewEnforcer("config/rbac_model.conf", "config/rbac_policy.csv")
+	if err != nil {
+		errMsg := fmt.Errorf("err casbin enforcer: %w", err)
 		panic(errMsg)
 	}
 
@@ -65,10 +74,19 @@ func main() {
 	v1Routes := r.Group("api/v1")
 	{
 		v1Routes.GET("/categories", categoryCotroller.GetList)
-		v1Routes.POST("/categories", categoryCotroller.Create)
 		v1Routes.GET("/categories/:id", categoryCotroller.Detail)
-		v1Routes.DELETE("/categories/:id", categoryCotroller.Delete)
-		v1Routes.PATCH("/categories/:id", categoryCotroller.Update)
+		v1Routes.POST("/categories",
+			middleware.AuthorizationMiddleware("bob", "categories", "write", enforcer),
+			categoryCotroller.Create,
+		)
+		v1Routes.DELETE("/categories/:id",
+			middleware.AuthorizationMiddleware("bob", "categories", "delete", enforcer),
+			categoryCotroller.Delete,
+		)
+		v1Routes.PATCH("/categories/:id",
+			middleware.AuthorizationMiddleware("bob", "categories", "patch", enforcer),
+			categoryCotroller.Update,
+		)
 	}
 
 	// run server

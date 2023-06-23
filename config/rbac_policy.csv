@@ -1,0 +1,5 @@
+p, admin, categories, write
+p, admin, categories, delete
+p, admin, categories, patch
+g, alice, admin
+g, bob, admin
