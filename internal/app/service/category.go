@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/ervinismu/purplestore/internal/app/model"
@@ -12,6 +13,8 @@ type CategoryRepository interface {
 	GetList() ([]model.Category, error)
 	Create(data model.Category) error
 	GetByID(id int) (model.Category, error)
+	DeleteByID(id int) error
+	Update(category model.Category) error
 }
 
 type CategoryService struct {
@@ -27,7 +30,7 @@ func (svc *CategoryService) GetList() ([]schema.CategoryListResponse, error) {
 
 	data, err := svc.repo.GetList()
 	if err != nil {
-		return response, err
+		return response, errors.New("failed get list category")
 	}
 
 	for _, value := range data {
@@ -51,7 +54,7 @@ func (svc *CategoryService) Create(req schema.CategoryCreateRequest) error {
 	if err != nil {
 		errMsg := fmt.Errorf("category service - err create : %w", err)
 		log.Error(errMsg)
-		return err
+		return errors.New("failed create category")
 	}
 
 	return nil
@@ -64,7 +67,7 @@ func (svc *CategoryService) Detail(req schema.CategoryDetailRequest) (schema.Cat
 	if err != nil {
 		errMsg := fmt.Errorf("category service - err detail : %w", err)
 		log.Error(errMsg)
-		return response, err
+		return response, errors.New("failed get detail category")
 	}
 
 	response.ID = data.ID
@@ -72,4 +75,40 @@ func (svc *CategoryService) Detail(req schema.CategoryDetailRequest) (schema.Cat
 	response.Description = data.Description
 
 	return response, nil
+}
+
+func (cs *CategoryService) DeleteByID(req schema.CategoryDeleteRequest) error {
+
+	_, err := cs.repo.GetByID(req.ID)
+	if err != nil {
+		return errors.New("failed delete category")
+	}
+
+	err = cs.repo.DeleteByID(req.ID)
+	if err != nil {
+		return errors.New("failed delete category")
+	}
+
+	return nil
+}
+
+func (cs *CategoryService) Update(req schema.CategoryUpdateRequest) error {
+
+	var updateData model.Category
+
+	oldData, err := cs.repo.GetByID(req.ID)
+	if err != nil {
+		return errors.New("failed update category")
+	}
+
+	updateData.ID = oldData.ID
+	updateData.Name = req.Name
+	updateData.Description = req.Description
+
+	err = cs.repo.Update(updateData)
+	if err != nil {
+		return errors.New("failed update category")
+	}
+
+	return nil
 }

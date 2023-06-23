@@ -19,7 +19,17 @@ type CategoryDetailRequest struct {
 	ID int
 }
 
+type CategoryDeleteRequest struct {
+	ID int
+}
+
 type CategoryDetailResponse struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
+type CategoryUpdateRequest struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`

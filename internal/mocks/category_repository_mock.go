@@ -48,6 +48,20 @@ func (mr *MockCategoryRepositoryMockRecorder) Create(data interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockCategoryRepository)(nil).Create), data)
 }
 
+// DeleteByID mocks base method.
+func (m *MockCategoryRepository) DeleteByID(id int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteByID", id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteByID indicates an expected call of DeleteByID.
+func (mr *MockCategoryRepositoryMockRecorder) DeleteByID(id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteByID", reflect.TypeOf((*MockCategoryRepository)(nil).DeleteByID), id)
+}
+
 // GetByID mocks base method.
 func (m *MockCategoryRepository) GetByID(id int) (model.Category, error) {
 	m.ctrl.T.Helper()
@@ -76,4 +90,18 @@ func (m *MockCategoryRepository) GetList() ([]model.Category, error) {
 func (mr *MockCategoryRepositoryMockRecorder) GetList() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetList", reflect.TypeOf((*MockCategoryRepository)(nil).GetList))
+}
+
+// Update mocks base method.
+func (m *MockCategoryRepository) Update(category model.Category) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", category)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Update indicates an expected call of Update.
+func (mr *MockCategoryRepositoryMockRecorder) Update(category interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockCategoryRepository)(nil).Update), category)
 }

@@ -67,6 +67,8 @@ func main() {
 		v1Routes.GET("/categories", categoryCotroller.GetList)
 		v1Routes.POST("/categories", categoryCotroller.Create)
 		v1Routes.GET("/categories/:id", categoryCotroller.Detail)
+		v1Routes.DELETE("/categories/:id", categoryCotroller.Delete)
+		v1Routes.PATCH("/categories/:id", categoryCotroller.Update)
 	}
 
 	// run server

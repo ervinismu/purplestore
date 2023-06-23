@@ -44,7 +44,7 @@ func TestCategoryService_Detail(t *testing.T) {
 			Given:       1,
 			Data:        model.Category{},
 			ExpectData:  0,
-			ExpectError: errors.New("error query"),
+			ExpectError: errors.New("failed get detail category"),
 		},
 	}
 

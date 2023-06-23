@@ -1,8 +1,12 @@
 package repository
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/ervinismu/purplestore/internal/app/model"
 	"github.com/jmoiron/sqlx"
+	log "github.com/sirupsen/logrus"
 )
 
 type CategoryRepository struct {
@@ -67,4 +71,52 @@ func (repo *CategoryRepository) GetByID(id int) (model.Category, error) {
 	}
 
 	return data, nil
+}
+
+// delete category by id
+func (cr *CategoryRepository) DeleteByID(id int) error {
+	var (
+		sqlStatement = `
+			DELETE FROM categories
+			WHERE id = $1
+		`
+	)
+
+	result, err := cr.DB.Exec(sqlStatement, id)
+	if err != nil {
+		log.Error(fmt.Errorf("error CategoryRepository - DeleteByID : %w", err))
+		return err
+	}
+
+	totalAffected, _ := result.RowsAffected()
+	if totalAffected <= 0 {
+		return errors.New("no record affected")
+	}
+
+	return nil
+}
+
+func (cr *CategoryRepository) Update(category model.Category) error {
+	var (
+		sqlStatement = `
+			UPDATE categories
+			SET updated_at = NOW(),
+				name = $2,
+				description = $3
+			WHERE id = $1
+		`
+	)
+
+	result, err := cr.DB.Exec(sqlStatement, category.ID, category.Name, category.Description)
+	if err != nil {
+		log.Error(fmt.Errorf("error CategoryRepository - UpdateByID : %w", err))
+		return err
+	}
+
+	totalAffected, _ := result.RowsAffected()
+	if totalAffected <= 0 {
+		return errors.New("no record affected")
+	}
+
+	return nil
 }

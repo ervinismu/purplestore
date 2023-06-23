@@ -12,6 +12,8 @@ type CategoryService interface {
 	GetList() ([]schema.CategoryListResponse, error)
 	Create(req schema.CategoryCreateRequest) error
 	Detail(req schema.CategoryDetailRequest) (schema.CategoryDetailResponse, error)
+	DeleteByID(req schema.CategoryDeleteRequest) error
+	Update(req schema.CategoryUpdateRequest) error
 }
 
 type CategoryController struct {
@@ -43,7 +45,7 @@ func (ctrl *CategoryController) Create(ctx *gin.Context) {
 
 	err = ctrl.service.Create(req)
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": "failed create category"})
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -61,9 +63,53 @@ func (ctrl *CategoryController) Detail(ctx *gin.Context) {
 	req := schema.CategoryDetailRequest{ID: categoryID}
 	response, err := ctrl.service.Detail(req)
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": "failed get detail category"})
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": err.Error()})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"data": response})
+}
+
+func (cc *CategoryController) Delete(ctx *gin.Context) {
+	categoryIDstr := ctx.Param("id")
+	categoryID, err := strconv.Atoi(categoryIDstr)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": "failed get detail category"})
+		return
+	}
+
+	req := schema.CategoryDeleteRequest{ID: categoryID}
+	err = cc.service.DeleteByID(req)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "success delete category"})
+}
+
+func (cc *CategoryController) Update(ctx *gin.Context) {
+	categoryIDstr := ctx.Param("id")
+	categoryID, err := strconv.Atoi(categoryIDstr)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": "failed get detail category"})
+		return
+	}
+
+	req := schema.CategoryUpdateRequest{}
+	err = ctx.ShouldBindJSON(&req)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": "failed get detail category"})
+		return
+	}
+
+	req.ID = categoryID
+
+	err = cc.service.Update(req)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "success update category"})
 }
