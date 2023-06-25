@@ -1,0 +1,121 @@
+openapi: 3.0.0
+info:
+  description: |
+    Purplestore api documentation.
+  version: "1.0.0"
+  title: Swagger Purplestore
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: 'https://localhost:8082'
+tags:
+  - name: Auth
+    description: Authentication for user
+
+paths:
+  /api/v1/auths/login:
+    post:
+      tags:
+        - Auth
+      summary: Login to API
+      description: Pet object that needs to be added to the store
+      required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: mail@mail.com
+                password:
+                  type: string
+                  example: mysecurepass
+
+  /api/v1/auths/logout:
+    get:
+      tags:
+        - Auth
+      summary: Logout process
+      description: User process logout
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer xxx.xxx.xxx
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid status value
+
+  /api/v1/auths/register:
+    post:
+      tags:
+        - Auth
+      summary: Login to API
+      description: Pet object that needs to be added to the store
+      required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: mail@mail.com
+                username:
+                  type: string
+                  example: myusername
+                password:
+                  type: string
+                  example: mysecurepass
+
+  /api/v1/auths/refresh:
+    post:
+      tags:
+        - Auth
+      summary: Refresh token process
+      description: User process refresh token
+      parameters:
+        - name: refresh_token
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer xxx.xxx.xxx
+      required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: mail@mail.com
+                username:
+                  type: string
+                  example: myusername
+                password:
+                  type: string
+                  example: mysecurepass
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid status value
