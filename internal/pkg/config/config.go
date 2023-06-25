@@ -1,12 +1,20 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"time"
+
+	"github.com/spf13/viper"
+)
 
 type Config struct {
-	AppPort        string `mapstructure:"APP_PORT"`
-	LogLevel       string `mapstructure:"LOG_LEVEL"`
-	DatabaseURL    string `mapstructure:"DATABASE_URL"`
-	DatabaseDriver string `mapstructure:"DATABASE_DRIVER"`
+	AppPort              string        `mapstructure:"APP_PORT"`
+	LogLevel             string        `mapstructure:"LOG_LEVEL"`
+	AccessTokenKey       string        `mapstructure:"ACCESS_TOKEN_KEY"`
+	RefreshTokenKey      string        `mapstructure:"REFRESH_TOKEN_KEY"`
+	AccessTokenDuration  time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	RefreshTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
+	DatabaseURL          string        `mapstructure:"DATABASE_URL"`
+	DatabaseDriver       string        `mapstructure:"DATABASE_DRIVER"`
 }
 
 func LoadConfig() (Config, error) {

@@ -63,14 +63,35 @@ func main() {
 
 	// init repo
 	categoryRepository := repository.NewCategoryRepository(dbConn)
+	userRepository := repository.NewUserRepository(dbConn)
+	authRepository := repository.NewAuthRepository(dbConn)
 
 	// init service
 	categoryService := service.NewCategorySerivce(categoryRepository)
+	tokenMaker := service.NewTokenMaker(
+		cfg.AccessTokenKey,
+		cfg.RefreshTokenKey,
+		cfg.AccessTokenDuration,
+		cfg.RefreshTokenDuration,
+	)
+	registrationService := service.NewRegistrationService(userRepository)
+	sessionService := service.NewSessionService(userRepository, authRepository, tokenMaker)
 
 	// init controller
 	categoryCotroller := controller.NewCategoryController(categoryService)
+	registrationController := controller.NewRegistrationController(registrationService)
+	sessionController := controller.NewSessionController(sessionService, tokenMaker)
 
-	// categories routes
+	authRoutes := r.Group("api/v1/auths")
+	{
+		authRoutes.POST("/register", registrationController.Register)
+		authRoutes.POST("/login", sessionController.Login)
+		authRoutes.GET("/refresh", sessionController.Refresh)
+		authRoutes.POST("/logout", middleware.AuthMiddleware(tokenMaker), sessionController.Logout)
+	}
+
+	r.Use(middleware.AuthMiddleware(tokenMaker))
+
 	v1Routes := r.Group("api/v1")
 	{
 		v1Routes.GET("/categories", categoryCotroller.GetList)
