@@ -5,6 +5,7 @@ import (
 
 	"github.com/ervinismu/purplestore/internal/app/model"
 	"github.com/ervinismu/purplestore/internal/app/schema"
+	"github.com/ervinismu/purplestore/internal/pkg/reason"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -19,7 +20,7 @@ func NewRegistrationService(userRepo UserRepository) *RegistrationService {
 func (svc *RegistrationService) Register(req *schema.RegisterRequest) error {
 	existingUser, _ := svc.userRepo.GetByEmailAndUsername(req.Email, req.Username)
 	if existingUser.ID > 0 {
-		return errors.New("failed register user")
+		return errors.New(reason.RegisterFailed)
 	}
 
 	var insertData model.User
@@ -30,7 +31,7 @@ func (svc *RegistrationService) Register(req *schema.RegisterRequest) error {
 
 	err := svc.userRepo.Create(insertData)
 	if err != nil {
-		return errors.New("failed register user")
+		return errors.New(reason.RegisterFailed)
 	}
 
 	return nil

@@ -9,6 +9,7 @@ import (
 
 	"github.com/ervinismu/purplestore/internal/app/model"
 	"github.com/ervinismu/purplestore/internal/app/schema"
+	"github.com/ervinismu/purplestore/internal/pkg/reason"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -52,27 +53,27 @@ func (svc *SessionService) Login(req *schema.LoginRequest) (schema.LoginResp, er
 	// find existing user by userID
 	existingUser, _ := svc.userRepo.GetByEmail(req.Email)
 	if existingUser.ID <= 0 {
-		return resp, errors.New("failed login")
+		return resp, errors.New(reason.SessionFailedLogin)
 	}
 
 	// verify password
 	isVerified := svc.verifyPassword(existingUser.HashedPassword, req.Password)
 	if !isVerified {
-		return resp, errors.New("failed login")
+		return resp, errors.New(reason.SessionFailedLogin)
 	}
 
 	// generate access token
 	accessToken, _, err := svc.tokenMaker.GenerateAccessToken(existingUser.ID)
 	if err != nil {
 		log.Error(fmt.Errorf("access token creation : %w", err))
-		return resp, errors.New("failed login")
+		return resp, errors.New(reason.SessionFailedLogin)
 	}
 
 	// generate refresh token
 	refreshToken, expiredAt, err := svc.tokenMaker.GenerateRefreshToken(existingUser.ID)
 	if err != nil {
 		log.Error(fmt.Errorf("refresh token creation : %w", err))
-		return resp, errors.New("failed login")
+		return resp, errors.New(reason.SessionFailedLogin)
 	}
 
 	resp.AccessToken = accessToken
@@ -88,7 +89,7 @@ func (svc *SessionService) Login(req *schema.LoginRequest) (schema.LoginResp, er
 	err = svc.authRepo.Create(authPayload)
 	if err != nil {
 		log.Error(fmt.Errorf("refresh token saving : %w", err))
-		return resp, errors.New("failed login")
+		return resp, errors.New(reason.SessionFailedLogin)
 	}
 
 	return resp, nil
@@ -98,7 +99,7 @@ func (svc *SessionService) Logout(UserID int) error {
 	err := svc.authRepo.DeleteAllByUserID(UserID)
 	if err != nil {
 		log.Error(fmt.Errorf("refresh token saving : %w", err))
-		return errors.New("failed logout")
+		return errors.New(reason.SessionFailedLogout)
 	}
 	return nil
 }
@@ -108,13 +109,13 @@ func (svc *SessionService) Refresh(req *schema.RefreshTokenRequest) (schema.Refr
 
 	existingUser, _ := svc.userRepo.GetByID(req.UserID)
 	if existingUser.ID <= 0 {
-		return resp, errors.New("failed refresh token")
+		return resp, errors.New(reason.SessionFailedRefresh)
 	}
 
 	auth, err := svc.authRepo.Find(existingUser.ID, req.RefreshToken)
 	if err != nil || auth.ID < 0 {
 		log.Error(fmt.Errorf("error SessionService - refresh : %w", err))
-		return resp, errors.New("failed refresh token")
+		return resp, errors.New(reason.SessionFailedRefresh)
 	}
 
 	accessToken, _, _ := svc.tokenMaker.GenerateAccessToken(existingUser.ID)
