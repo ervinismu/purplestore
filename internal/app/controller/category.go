@@ -5,6 +5,8 @@ import (
 	"strconv"
 
 	"github.com/ervinismu/purplestore/internal/app/schema"
+	"github.com/ervinismu/purplestore/internal/pkg/handler"
+	"github.com/ervinismu/purplestore/internal/pkg/reason"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,11 +29,11 @@ func NewCategoryController(service CategoryService) *CategoryController {
 func (ctrl *CategoryController) GetList(ctx *gin.Context) {
 	response, err := ctrl.service.GetList()
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"data": response})
+	handler.ResponseSuccess(ctx, http.StatusOK, "", response)
 }
 
 func (ctrl *CategoryController) Create(ctx *gin.Context) {
@@ -39,67 +41,67 @@ func (ctrl *CategoryController) Create(ctx *gin.Context) {
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	err = ctrl.service.Create(req)
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": err.Error()})
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{"message": "success create category"})
+	handler.ResponseSuccess(ctx, http.StatusCreated, reason.CategorySuccessCreate, nil)
 }
 
 func (ctrl *CategoryController) Detail(ctx *gin.Context) {
 	categoryIDstr := ctx.Param("id")
 	categoryID, err := strconv.Atoi(categoryIDstr)
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": "failed get detail category"})
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, reason.CategoryFailedGetDetail)
 		return
 	}
 
 	req := schema.CategoryDetailRequest{ID: categoryID}
 	response, err := ctrl.service.Detail(req)
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": err.Error()})
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"data": response})
+	handler.ResponseSuccess(ctx, http.StatusOK, "", response)
 }
 
 func (cc *CategoryController) Delete(ctx *gin.Context) {
 	categoryIDstr := ctx.Param("id")
 	categoryID, err := strconv.Atoi(categoryIDstr)
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": "failed get detail category"})
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, reason.CategoryFailedDelete)
 		return
 	}
 
 	req := schema.CategoryDeleteRequest{ID: categoryID}
 	err = cc.service.DeleteByID(req)
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": err.Error()})
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "success delete category"})
+	handler.ResponseSuccess(ctx, http.StatusCreated, reason.CategorySuccessDelete, nil)
 }
 
 func (cc *CategoryController) Update(ctx *gin.Context) {
 	categoryIDstr := ctx.Param("id")
 	categoryID, err := strconv.Atoi(categoryIDstr)
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": "failed get detail category"})
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, reason.CategoryFailedUpdate)
 		return
 	}
 
 	req := schema.CategoryUpdateRequest{}
 	err = ctx.ShouldBindJSON(&req)
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": "failed get detail category"})
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, reason.CategoryFailedUpdate)
 		return
 	}
 
@@ -107,9 +109,9 @@ func (cc *CategoryController) Update(ctx *gin.Context) {
 
 	err = cc.service.Update(req)
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": err.Error()})
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "success update category"})
+	handler.ResponseSuccess(ctx, http.StatusCreated, reason.CategorySuccessUpdate, nil)
 }
