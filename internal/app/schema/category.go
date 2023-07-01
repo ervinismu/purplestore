@@ -1,7 +1,8 @@
 package schema
 
-type Category struct {
-
+type CategorySearch struct {
+	Page     int
+	PageSize int
 }
 
 type CategoryListResponse struct {

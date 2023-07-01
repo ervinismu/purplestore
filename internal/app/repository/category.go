@@ -17,13 +17,21 @@ func NewCategoryRepository(db *sqlx.DB) *CategoryRepository {
 	return &CategoryRepository{DB: db}
 }
 
-func (repo *CategoryRepository) GetList() ([]model.Category, error) {
+func (repo *CategoryRepository) GetList(search model.CategorySearch) ([]model.Category, error) {
 	var (
+		limit        = search.PageSize
+		offset       = limit * (search.Page - 1)
 		categories   []model.Category
-		sqlStatement = "SELECT id, name, description FROM categories"
+		sqlStatement = `
+			SELECT id, name, description
+			FROM categories
+			ORDER BY id
+			LIMIT $1
+			OFFSET $2
+		`
 	)
 
-	rows, err := repo.DB.Queryx(sqlStatement)
+	rows, err := repo.DB.Queryx(sqlStatement, limit, offset)
 	if err != nil {
 		return categories, err
 	}

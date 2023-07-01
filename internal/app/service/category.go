@@ -18,10 +18,13 @@ func NewCategorySerivce(repo CategoryRepository) *CategoryService {
 	return &CategoryService{repo: repo}
 }
 
-func (svc *CategoryService) GetList() ([]schema.CategoryListResponse, error) {
+func (svc *CategoryService) GetList(search schema.CategorySearch) ([]schema.CategoryListResponse, error) {
 	var response []schema.CategoryListResponse
 
-	data, err := svc.repo.GetList()
+	searchCategory := model.CategorySearch{}
+	searchCategory.Page = search.Page
+	searchCategory.PageSize = search.PageSize
+	data, err := svc.repo.GetList(searchCategory)
 	if err != nil {
 		return response, errors.New(reason.CategoryFailedGetList)
 	}

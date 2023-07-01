@@ -11,7 +11,7 @@ import (
 )
 
 type CategoryService interface {
-	GetList() ([]schema.CategoryListResponse, error)
+	GetList(search schema.CategorySearch) ([]schema.CategoryListResponse, error)
 	Create(req schema.CategoryCreateRequest) error
 	Detail(req schema.CategoryDetailRequest) (schema.CategoryDetailResponse, error)
 	DeleteByID(req schema.CategoryDeleteRequest) error
@@ -27,7 +27,11 @@ func NewCategoryController(service CategoryService) *CategoryController {
 }
 
 func (ctrl *CategoryController) GetList(ctx *gin.Context) {
-	response, err := ctrl.service.GetList()
+	search := schema.CategorySearch{}
+	search.Page = ctx.GetInt("page")
+	search.PageSize = ctx.GetInt("pageSize")
+
+	response, err := ctrl.service.GetList(search)
 	if err != nil {
 		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
