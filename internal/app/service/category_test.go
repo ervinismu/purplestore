@@ -4,9 +4,9 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/ervinismu/purplestore/internal/app/mocks"
 	"github.com/ervinismu/purplestore/internal/app/model"
 	"github.com/ervinismu/purplestore/internal/app/schema"
-	"github.com/ervinismu/purplestore/internal/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )

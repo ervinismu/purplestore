@@ -78,7 +78,7 @@ func (mr *MockCategoryRepositoryMockRecorder) GetByID(id interface{}) *gomock.Ca
 }
 
 // GetList mocks base method.
-func (m *MockCategoryRepository) GetList(search model.CategoryList) ([]model.Category, error) {
+func (m *MockCategoryRepository) GetList(search model.CategorySearch) ([]model.Category, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetList", search)
 	ret0, _ := ret[0].([]model.Category)

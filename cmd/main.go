@@ -94,7 +94,10 @@ func main() {
 
 	v1Routes := r.Group("api/v1")
 	{
-		v1Routes.GET("/categories", categoryCotroller.GetList)
+		v1Routes.GET("/categories",
+			middleware.PaginationMiddleware(),
+			categoryCotroller.GetList,
+		)
 		v1Routes.GET("/categories/:id", categoryCotroller.Detail)
 		v1Routes.POST("/categories",
 			middleware.AuthorizationMiddleware("bob", "categories", "write", enforcer),

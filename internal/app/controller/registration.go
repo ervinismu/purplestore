@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/ervinismu/purplestore/internal/app/schema"
+	"github.com/ervinismu/purplestore/internal/pkg/handler"
+	"github.com/ervinismu/purplestore/internal/pkg/reason"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,15 +25,15 @@ func (ctrl *RegistrationController) Register(ctx *gin.Context) {
 	req := &schema.RegisterRequest{}
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		handler.ResponseError(ctx, http.StatusUnauthorized, err.Error())
 		return
 	}
 
 	err = ctrl.service.Register(req)
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"message": err.Error()})
+		handler.ResponseError(ctx, http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "success register"})
+	handler.ResponseSuccess(ctx, http.StatusCreated, reason.RegisterSuccess, nil)
 }

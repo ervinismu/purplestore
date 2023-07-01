@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/casbin/casbin/v2"
+	"github.com/ervinismu/purplestore/internal/pkg/handler"
+	"github.com/ervinismu/purplestore/internal/pkg/reason"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,7 +19,7 @@ func AuthorizationMiddleware(sub string, obj string, action string, enforcer *ca
 		if res {
 			ctx.Next()
 		} else {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"message": "you are not authorized to perform this action."})
+			handler.ResponseError(ctx, http.StatusUnprocessableEntity, reason.Unauthorized)
 			ctx.Abort()
 			return
 		}

@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/ervinismu/purplestore/internal/pkg/handler"
+	"github.com/ervinismu/purplestore/internal/pkg/reason"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +18,7 @@ func AuthMiddleware(tokenMaker AccessTokenVerifier) gin.HandlerFunc {
 		// get token from header
 		accessToken := tokenFromHeader(ctx)
 		if accessToken == "" {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
+			handler.ResponseError(ctx, http.StatusUnauthorized, reason.Unauthorized)
 			ctx.Abort()
 			return
 		}
@@ -24,7 +26,7 @@ func AuthMiddleware(tokenMaker AccessTokenVerifier) gin.HandlerFunc {
 		// verify
 		sub, err := tokenMaker.VerifyAccessToken(accessToken)
 		if err != nil {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
+			handler.ResponseError(ctx, http.StatusUnauthorized, reason.Unauthorized)
 			ctx.Abort()
 			return
 		}
